@@ -1,0 +1,13 @@
+{
+  "name": "ai-tool-digest-api-check",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone connectivity/auth checks for all sources used by the AI Tool Digest pipeline",
+  "scripts": {
+    "test-apis": "node test/test-apis.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
