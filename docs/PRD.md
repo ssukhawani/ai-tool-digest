@@ -1,5 +1,5 @@
 # PRD — AI Tool Trend Digest Pipeline
-## Automated weekly research aggregator for content + product research
+## Automated research aggregator for content + product research (Mon/Wed/Fri)
 
 ---
 
@@ -11,8 +11,8 @@ judgment calls. This system automates the collection + ranking step so a human
 only reviews a short, pre-filtered digest and picks the week's focus (video +
 possible build).
 
-**Primary user (v1):** solo builder (you), digest delivered via email every
-Monday morning.
+**Primary user (v1):** solo builder (you), digest delivered via email Monday,
+Wednesday, and Friday mornings.
 
 **Future user (v2, optional):** public subscribers — same pipeline, multi-recipient
 delivery, possibly a public web digest.
@@ -33,20 +33,20 @@ delivery, possibly a public web digest.
 
 - No public-facing UI/dashboard (email only)
 - No multi-user subscriber management
-- No real-time alerts — weekly cadence only
+- No real-time alerts — scheduled Mon/Wed/Fri cadence only
 - No payment/billing logic
 
 ---
 
 ## 4. USERS & JOURNEY
 
-### 4.1 Primary journey (you, weekly)
+### 4.1 Primary journey (you, Mon/Wed/Fri)
 
-1. Monday 6:00 AM IST — pipeline runs automatically (Cloud Scheduler trigger)
+1. Mon/Wed/Fri 9:30 AM IST — pipeline runs automatically (Cloud Scheduler trigger)
 2. Pipeline fetches from all 3 sources, dedupes, ranks, summarizes via LLM
-3. Digest email lands in inbox by ~6:15 AM
+3. Digest email lands in inbox by ~9:55 AM
 4. You read digest (5-10 min), pick the week's tool/topic
-5. You proceed with Tue-Sat build/record/edit/publish cycle (separate,
+5. You proceed with the build/record/edit/publish cycle (separate,
    manual — outside this system's scope)
 
 ### 4.2 Failure journey
@@ -271,7 +271,7 @@ without LLM commentary so the email never fails to deliver.
 
 ## 11. SCHEDULING
 
-- Cloud Scheduler job, cron `0 6 * * 1` (Monday 06:00), timezone `Asia/Kolkata`
+- Cloud Scheduler job, cron `30 9 * * 1,3,5` (Mon/Wed/Fri 09:30), timezone `Asia/Kolkata`
 - Triggers `collectSources` via authenticated HTTPS call
 - `summarizeDigest` triggered either:
   - (a) by a second Cloud Scheduler job 15 min later, or
@@ -295,9 +295,9 @@ without LLM commentary so the email never fails to deliver.
 
 ## 13. SUCCESS METRICS (v1)
 
-- Digest arrives every Monday without manual intervention for 4 consecutive
+- Digest arrives every Mon/Wed/Fri without manual intervention for 4 consecutive
   weeks
-- Manual research time drops from ~3-5 hrs/week to <15 min review time
+- Manual research time drops from ~3-5 hrs/week to <15 min review time per digest
 - At least one "pick of the week" per month directly becomes a video topic
 
 ---

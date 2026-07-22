@@ -266,35 +266,46 @@ now reads `"sent"`.
 ## PHASE 8 — Scheduling (manual + code, ~30 min)
 
 ### 8.1 Create Cloud Scheduler jobs
+
+Runs Mon/Wed/Fri at 9:30 / 9:45 / 9:55 AM IST (cron day-of-week `1,3,5`):
+
 ```bash
 gcloud scheduler jobs create http weekly-collect \
   --location=asia-southeast1 \
-  --schedule="0 6 * * 1" \
+  --schedule="30 9 * * 1,3,5" \
   --time-zone="Asia/Kolkata" \
-  --uri="https://asia-southeast1-ai-tool-digest.cloudfunctions.net/collectSources" \
-  --http-method=POST
+  --uri="https://asia-southeast1-ai-tool-digest-sahil.cloudfunctions.net/collectSources" \
+  --http-method=POST \
+  --oidc-service-account-email="ai-tool-digest-sahil@appspot.gserviceaccount.com"
 
 gcloud scheduler jobs create http weekly-summarize \
   --location=asia-southeast1 \
-  --schedule="15 6 * * 1" \
+  --schedule="45 9 * * 1,3,5" \
   --time-zone="Asia/Kolkata" \
-  --uri="https://asia-southeast1-ai-tool-digest.cloudfunctions.net/summarizeDigest" \
-  --http-method=POST
+  --uri="https://asia-southeast1-ai-tool-digest-sahil.cloudfunctions.net/summarizeDigest" \
+  --http-method=POST \
+  --oidc-service-account-email="ai-tool-digest-sahil@appspot.gserviceaccount.com"
 
 gcloud scheduler jobs create http weekly-send \
   --location=asia-southeast1 \
-  --schedule="25 6 * * 1" \
+  --schedule="55 9 * * 1,3,5" \
   --time-zone="Asia/Kolkata" \
-  --uri="https://asia-southeast1-ai-tool-digest.cloudfunctions.net/sendDigest" \
-  --http-method=POST
+  --uri="https://asia-southeast1-ai-tool-digest-sahil.cloudfunctions.net/sendDigest" \
+  --http-method=POST \
+  --oidc-service-account-email="ai-tool-digest-sahil@appspot.gserviceaccount.com"
 ```
+
+To change the schedule later, use `gcloud scheduler jobs update http <name> --schedule="..."`.
 
 ### 8.2 Secure the endpoints (recommended)
 ```bash
-# Restrict functions to only be invoked by the Scheduler service account
+# Grant invoker to the Scheduler service account, then remove public access
 gcloud functions add-invoker-policy-binding collectSources \
-  --member="serviceAccount:ai-tool-digest@appspot.gserviceaccount.com"
-# Repeat for summarizeDigest, sendDigest
+  --region=asia-southeast1 \
+  --member="serviceAccount:ai-tool-digest-sahil@appspot.gserviceaccount.com"
+gcloud run services remove-iam-policy-binding collectsources \
+  --region=asia-southeast1 --member="allUsers" --role="roles/run.invoker"
+# Repeat for summarizeDigest/summarizedigest and sendDigest/senddigest
 ```
 
 **Expected output:** `gcloud scheduler jobs list` shows all 3 jobs; manually
